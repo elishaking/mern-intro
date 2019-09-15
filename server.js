@@ -1,6 +1,10 @@
 const express = require('express');
 const mongoose = require('mongoose');
 
+const users = require('./routes/api/users');
+const profile = require('./routes/api/profile');
+const posts = require('./routes/api/posts');
+
 const server = express();
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => console.log(`Server running on port: ${PORT}`));
@@ -20,3 +24,7 @@ server.use(express.json());
 server.get('/', (req, res) => {
   res.send("Hello");
 });
+
+server.use('/api/users', users);
+server.use('/api/profile', profile);
+server.use('/api/posts', posts);
