@@ -20,6 +20,7 @@ mongoose.connect(db, {
 }).catch(err => console.log(err));
 
 server.use(express.json());
+server.use(express.urlencoded({ extended: false }));
 
 server.get('/', (req, res) => {
   res.send("Hello");
