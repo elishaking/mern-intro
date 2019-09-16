@@ -1,11 +1,11 @@
 const express = require('express');
 const mongoose = require('mongoose');
-
-const users = require('./routes/api/users');
-const profile = require('./routes/api/profile');
-const posts = require('./routes/api/posts');
+const passport = require('passport');
 
 const server = express();
+server.use(express.json());
+server.use(express.urlencoded({ extended: false }));
+
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => console.log(`Server running on port: ${PORT}`));
 
@@ -19,8 +19,16 @@ mongoose.connect(db, {
   console.log("MongoDB connected");
 }).catch(err => console.log(err));
 
-server.use(express.json());
-server.use(express.urlencoded({ extended: false }));
+const users = require('./routes/api/users');
+const profile = require('./routes/api/profile');
+const posts = require('./routes/api/posts');
+
+//Passport Middleware
+server.use(passport.initialize());
+
+//Passport Config
+const passportConfig = require('./config/passport');
+passportConfig(passport);
 
 server.get('/', (req, res) => {
   res.send("Hello");
