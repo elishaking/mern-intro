@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 
 // Load Input Validation
-const validateProfileInput = require('../../validation/profile');
+const { validateProfileInput, validateExperienceInput, validateEducationInput } = require('../../validation/profile');
 
 // Load profile model
 const Profile = require('../../models/Profile');
@@ -47,6 +47,7 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
   // Check Validation
   if (!isValid) {
     res.status(400).json(errors);
+    return;
   }
 
   // get fields from req.body
@@ -87,6 +88,7 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
             if (profile) {
               errors.handle = 'That handle already exists';
               res.status(400).json(errors);
+              return;
             }
 
             new Profile(profileFields).save().then((profile) => {
@@ -109,6 +111,7 @@ router.get('/all', (req, res) => {
       if (!profiles) {
         errors.noprofile = "There are no profiles";
         res.status(404).json(errors);
+        return;
       }
 
       res.json(profiles);
@@ -129,6 +132,7 @@ router.get('/handle/:handle', (req, res) => {
       if (!profile) {
         errors.noprofile = "There is no profile for this user";
         res.status(404).json(errors);
+        return;
       }
 
       res.json(profile);
@@ -147,12 +151,73 @@ router.get('/user/:user_id', (req, res) => {
       if (!profile) {
         errors.noprofile = "There is no profile for this user";
         res.status(404).json(errors);
+        return;
       }
 
       res.json(profile);
     }).catch((err) => res.status(404).json({
       noprofile: "There is no profile for this user"
     }));
+});
+
+// @route POST api/profile/experience
+// @description Add experience to profile
+// @access Private
+router.post('/experience', passport.authenticate('jwt', { session: false }), (req, res) => {
+  const { errors, isValid } = validateExperienceInput(req.body);
+
+  // Check Validation
+  if (!isValid) {
+    res.status(400).json(errors);
+    return;
+  }
+
+  Profile.findOne({ user: req.user.id })
+    .then((profile) => {
+      const newExp = {
+        title: req.body.title,
+        company: req.body.company,
+        location: req.body.location,
+        from: req.body.from,
+        to: req.body.to,
+        current: req.body.current,
+        description: req.body.description
+      };
+
+      // Add newExp to the beginning of experience array
+      profile.experience.unshift(newExp);
+      profile.save().then((profile) => res.json(profile));
+    });
+});
+
+// @route POST api/profile/education
+// @description Add education to profile
+// @access Private
+router.post('/education', passport.authenticate('jwt', { session: false }), (req, res) => {
+  const { errors, isValid } = validateEducationInput(req.body);
+
+  // Check Validation
+  if (!isValid) {
+    res.status(400).json(errors);
+    return;
+  }
+
+  Profile.findOne({ user: req.user.id })
+    .then((profile) => {
+      const newEdu = {
+        school: req.body.school,
+        degree: req.body.degree,
+        fieldofstudy: req.body.fieldofstudy,
+        from: req.body.from,
+        to: req.body.to,
+        current: req.body.current,
+        description: req.body.description
+      };
+
+      // Add newEdu to the beginning of education array
+      profile.education.unshift(newEdu);
+      profile.save().then((profile) => res.json(profile));
+    });
 });
 
 module.exports = router;
