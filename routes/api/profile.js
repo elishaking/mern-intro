@@ -17,7 +17,7 @@ router.get('/test', (req, res) => {
   });
 });
 
-// @route GET api/profile/test
+// @route GET api/profile/
 // @description Get current users profile
 // @access Private
 router.get('/', passport.authenticate('jwt', { session: false }), (req, res) => {
