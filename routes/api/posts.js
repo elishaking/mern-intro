@@ -141,4 +141,60 @@ router.post('/unlike/:post_id', passport.authenticate('jwt', { session: false })
   });
 });
 
+// @route POST api/posts/comment/:post_id
+// @description Add comment to post
+// @access Private
+router.post('/comment/:post_id', passport.authenticate('jwt', { session: false }), (req, res) => {
+  //? since comment has similar fields as post:
+  const { errors, isValid } = validatePostInput(req.body);
+
+  if (!isValid) {
+    return res.status(400).json(errors);
+  }
+
+  Profile.findOne({ user: req.user.id }).then((profile) => {
+    Post.findById(req.params.post_id).then((post) => {
+      const newComment = {
+        text: req.body.text,
+        name: req.body.name,
+        avatar: req.body.avatar,
+        user: req.user.id
+      };
+
+      // Add to comments array
+      post.comments.unshift(newComment);
+      post.save().then((post) => res.json(post));
+    }).catch((err) => res.status(404).json({
+      postnotfound: 'Post not found'
+    }));
+  });
+});
+
+// @route DELETE api/posts/comment/:post_id/:comment_id
+// @description Delete comment from post
+// @access Private
+router.delete('/comment/:post_id/:comment_id', passport.authenticate('jwt', { session: false }), (req, res) => {
+  Profile.findOne({ user: req.user.id }).then((profile) => {
+    Post.findById(req.params.post_id).then((post) => {
+      // Check if comment exists
+      if (post.comments.filter((comment) => comment._id.toString() === req.params.comment_id).length === 0) {
+        return res.status(404).json({
+          commentnotexists: "Comment does not exist"
+        });
+      }
+
+      // Get remove index
+      const removeIndex = post.comments
+        .map((item) => item._id)
+        .indexOf(req.params.comment_id);
+
+      // remove comment from comments array using removeIndex
+      post.comments.splice(removeIndex, 1);
+      post.save().then((post) => res.json(post));
+    }).catch((err) => res.status(404).json({
+      postnotfound: 'Post not found'
+    }));
+  });
+});
+
 module.exports = router;
