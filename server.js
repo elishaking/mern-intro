@@ -9,6 +9,13 @@ server.use(express.urlencoded({ extended: false }));
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => console.log(`Server running on port: ${PORT}`));
 
+// log all requests
+server.use('*', (req, res, next) => {
+  const z = Date().split(" ");
+  console.log(`${z[4]}: ${req.method} Request: ${req.originalUrl}`); // ${z[3]}-${z[1]}-${z[2]} 
+  next();
+});
+
 //DB Config
 const db = require('./config/keys').mongoURILocal;
 // Connect to MongoDB through Mongoose
