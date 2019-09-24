@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import axios from 'axios';
 
 export default class Register extends Component {
   //component state
@@ -34,7 +35,10 @@ export default class Register extends Component {
       confirmPassword: this.state.confirmPassword
     }
 
-    console.log(newUser);
+    //? short links possible b/cus of proxy setup
+    axios.post('/api/users/register', newUser)
+      .then((res) => console.log(res.data))
+      .catch((err) => console.log(err.response.data));
   }
 
   render() {
