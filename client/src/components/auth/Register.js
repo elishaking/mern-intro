@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types'
 import axios from 'axios';
 import classnames from 'classnames';
+import { connect } from 'react-redux';
+import { registerUser } from '../../actions/authActions';
 
-export default class Register extends Component {
+class Register extends Component {
   //component state
   constructor() {
     super();
@@ -36,19 +39,25 @@ export default class Register extends Component {
       confirmPassword: this.state.confirmPassword
     }
 
+    // all registered redux actions are available on this.props
+    this.props.registerUser(newUser);
+
     //? short links possible b/cus of proxy setup
-    axios.post('/api/users/register', newUser)
-      .then((res) => console.log(res.data))
-      .catch((err) => this.setState({
-        errors: err.response.data
-      }));
+    // axios.post('/api/users/register', newUser)
+    //   .then((res) => console.log(res.data))
+    //   .catch((err) => this.setState({
+    //     errors: err.response.data
+    //   }));
   }
 
   render() {
     const errors = this.state.errors;
 
+    const { user } = this.props.auth;
+
     return (
       <div className="register">
+        {user ? user.name : null}
         <div className="container">
           <div className="row">
             <div className="col-md-8 m-auto">
@@ -110,3 +119,14 @@ export default class Register extends Component {
     )
   }
 }
+
+Register.propTypes = {
+  registerUser: PropTypes.func.isRequired,
+  auth: PropTypes.object.isRequired
+};
+
+const mapStateToProps = (state) => ({
+  auth: state.auth
+});
+
+export default connect(mapStateToProps, { registerUser })(Register);
