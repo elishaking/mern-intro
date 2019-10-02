@@ -23,6 +23,13 @@ class Register extends Component {
     // this.onSubmit = this.onSubmit.bind(this);
   }
 
+  componentDidMount() {
+    // if user is already authenticated, redirect to dashboard
+    if (this.props.auth.isAuthenticated) {
+      this.props.history.push('/dashboard');
+    }
+  }
+
   componentWillReceiveProps(nextProps) {
     //? put new props (mostly from redux) into component state
     if (nextProps.errors) {
