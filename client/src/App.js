@@ -15,6 +15,7 @@ import Landing from './components/layout/Landing';
 import Register from './components/auth/Register';
 import Login from './components/auth/Login';
 import Dashboard from './components/dashboard/Dashboard';
+import CreateProfle from './components/create-profile/CreateProfile';
 
 import './App.css';
 
@@ -56,6 +57,9 @@ function App() {
             {/* All private routes are wrapped in Switch to prevent redirect issues */}
             <Switch>
               <PrivateRoute exact path="/dashboard" component={Dashboard} />
+            </Switch>
+            <Switch>
+              <PrivateRoute exact path="/create-profile" component={CreateProfle} />
             </Switch>
           </div>
           <Footer />
