@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import TextFieldGroup from '../common/TextFieldGroup';
 import TextAreaFieldGroup from '../common/TextAreaFieldGroup';
 import InputGroup from '../common/InputGroup';
 import SelectListGroup from '../common/SelectListGroup';
+import { createProfile } from '../../actions/profileActions';
 
 class CreateProfile extends Component {
   constructor(props) {
@@ -27,6 +29,14 @@ class CreateProfile extends Component {
     };
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.errors) {
+      this.setState({
+        errors: nextProps.errors
+      });
+    }
+  }
+
   onChange = (e) => {
     this.setState({
       [e.target.name]: e.target.value
@@ -35,6 +45,14 @@ class CreateProfile extends Component {
 
   onSubmit = (e) => {
     e.preventDefault();
+
+    const { handle, company, website, location, status, skills, githubusername, bio, twitter, facebook, linkedin, youtube, instagram } = this.state;
+    const profileData = {
+      handle, company, website, location, status, skills, githubusername, bio, twitter, facebook, linkedin, youtube, instagram
+    };
+
+    //? all redux actions and data are stored in props due to mapStateToProps => maps redux state to component props
+    this.props.createProfile(profileData, this.props.history);
   }
 
   render() {
@@ -185,7 +203,7 @@ class CreateProfile extends Component {
                 />
 
                 <div className="mb-3">
-                  <button onClick={() => {
+                  <button type="button" onClick={() => {
                     this.setState((prevState) => ({
                       displaySocialInputs: !prevState.displaySocialInputs
                     }))
@@ -215,4 +233,4 @@ const mapStateToProps = (state) => ({
   errors: state.errors
 });
 
-export default connect(mapStateToProps)(CreateProfile);
+export default connect(mapStateToProps, { createProfile })(withRouter(CreateProfile)); //? to enable history
